@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ranking de Vendas · Hoje · Murano Professional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --murano-dark:   #1c0e1b;
+    --murano-wine:   #621244;
+    --murano-black:  #241327;
+    --murano-orange: #dd4222;
+    --murano-blush:  #e4d4d3;
+    --murano-light:  #f5edf4;
+    --murano-muted:  #9a8098;
+    --murano-white:  #ffffff;
+    --card:          rgba(36, 19, 39, 0.72);
+    --card-border:   rgba(98, 18, 68, 0.45);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--murano-dark); }
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--murano-blush);
+    min-height: 100vh;
+    background: linear-gradient(155deg, #1c0e1b 0%, #0d0512 100%);
+    position: relative;
+    overflow-x: hidden;
+    font-variant-numeric: tabular-nums;
+  }
+  .grid-bg {
+    position: fixed; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(98,18,68,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(98,18,68,0.055) 1px, transparent 1px);
+    background-size: 65px 65px;
+  }
+  .orb {
+    position: fixed; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(98,18,68,0.55) 0%, transparent 65%);
+    animation: pulse 7s ease-in-out infinite;
+  }
+  .orb-1 { width: 520px; height: 520px; top: -180px; right: -140px; }
+  .orb-2 { width: 420px; height: 420px; bottom: -160px; left: -120px; animation-delay: 3.5s; }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 0.8; }
+    50%      { transform: scale(1.12); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .orb, .bar-fill, .live-dot { animation: none !important; transition: none !important; }
+  }
+  .stripe {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 5px; z-index: 5;
+    background: linear-gradient(to bottom, var(--murano-orange), var(--murano-wine), #7b2d8b);
+  }
+  .wrap {
+    position: relative; z-index: 2;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 2.6rem 1.4rem 3.4rem;
+  }
+  .topline { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    border: 1px solid rgba(221,66,34,0.45);
+    color: var(--murano-orange);
+    border-radius: 100px;
+    padding: 0.32rem 0.95rem;
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .live {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border: 1px solid rgba(154,128,152,0.35);
+    border-radius: 100px; padding: 0.32rem 0.95rem;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--murano-muted);
+  }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--murano-orange); animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  h1 {
+    font-family: 'Syne', 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5.5vw, 3.2rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--murano-white);
+    text-wrap: balance;
+  }
+  .subtitle { margin-top: 0.65rem; font-size: 1.02rem; color: var(--murano-muted); font-weight: 400; }
+  .subtitle strong { color: var(--murano-blush); font-weight: 600; text-transform: capitalize; }
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.8rem;
+    margin: 2rem 0 2.4rem;
+  }
+  .kpi {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 0.95rem 1.1rem;
+  }
+  .kpi .label {
+    font-size: 0.66rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--murano-muted);
+    margin-bottom: 0.4rem;
+  }
+  .kpi .value { font-size: 1.32rem; font-weight: 800; color: var(--murano-white); letter-spacing: -0.01em; }
+  .kpi.hero {
+    grid-column: 1 / -1;
+    background: linear-gradient(120deg, rgba(98,18,68,0.55), rgba(221,66,34,0.22));
+    border-color: rgba(221,66,34,0.5);
+  }
+  .kpi.hero .value { font-size: 2.2rem; }
+  .kpi.hero .label { color: rgba(228,212,211,0.8); }
+  .kpi .sub { font-size: 0.72rem; color: var(--murano-muted); margin-top: 0.3rem; }
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .section-title h2 { font-family: 'Syne', 'Inter', sans-serif; font-weight: 800; font-size: 1.35rem; color: var(--murano-white); letter-spacing: -0.01em; }
+  .section-title span { font-size: 0.76rem; color: var(--murano-muted); }
+  .ranking { display: flex; flex-direction: column; gap: 0.55rem; list-style: none; }
+  .row {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr auto;
+    grid-template-areas: "pos name valor" "pos bar bar" "pos meta meta";
+    align-items: center;
+    column-gap: 0.9rem;
+    row-gap: 0.38rem;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 0.8rem 1.1rem;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .row:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(13,5,18,0.55); border-color: rgba(221,66,34,0.5); }
+  .row.top1 { background: linear-gradient(120deg, rgba(221,66,34,0.28), rgba(98,18,68,0.5)); border-color: rgba(221,66,34,0.65); }
+  .pos {
+    grid-area: pos;
+    width: 2.4rem; height: 2.4rem; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.95rem;
+    background: rgba(98,18,68,0.5); color: var(--murano-blush);
+    border: 1px solid rgba(154,128,152,0.35);
+  }
+  .top1 .pos { background: var(--murano-orange); color: #fff; border-color: transparent; }
+  .top2 .pos, .top3 .pos { background: var(--murano-wine); color: #fff; border-color: transparent; }
+  .name { grid-area: name; font-weight: 600; font-size: 0.95rem; color: var(--murano-white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .valor { grid-area: valor; font-weight: 800; font-size: 1rem; color: var(--murano-white); text-align: right; white-space: nowrap; }
+  .top1 .valor { color: #ffb59e; }
+  .bar { grid-area: bar; height: 6px; border-radius: 100px; background: rgba(154,128,152,0.18); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--murano-orange), var(--murano-wine)); width: 0; transition: width 0.9s cubic-bezier(.22,.9,.35,1); }
+  .meta { grid-area: meta; font-size: 0.72rem; color: var(--murano-muted); display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .meta b { color: var(--murano-blush); font-weight: 600; }
+  .empty { background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.4rem; text-align: center; color: var(--murano-muted); font-size: 0.9rem; list-style: none; }
+  .note {
+    background: rgba(221,66,34,0.07);
+    border: 1px solid rgba(221,66,34,0.18);
+    border-left: 3px solid var(--murano-orange);
+    border-radius: 0 10px 10px 0;
+    padding: 0.6rem 1rem;
+    font-size: 0.78rem;
+    color: rgba(228,212,211,0.65);
+    line-height: 1.5;
+    margin-top: 2rem;
+  }
+  footer {
+    margin-top: 2.2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 1rem; flex-wrap: wrap;
+    font-size: 0.72rem; color: var(--murano-muted);
+    letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700;
+  }
+  footer .brand { color: var(--murano-blush); }
+  @media (max-width: 560px) {
+    .kpi.hero .value { font-size: 1.7rem; }
+    .valor { font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="stripe"></div>
+
+<div class="wrap">
+  <header>
+    <div class="topline">
+      <div class="eyebrow">B.I. Comercial · Ranking Diário</div>
+      <div class="live"><span class="live-dot"></span> Ao vivo · atualiza a cada 60s</div>
+    </div>
+    <h1>Ranking de Vendas</h1>
+    <p class="subtitle"><strong id="dataDia">—</strong> · faturamento líquido por vendedor</p>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Indicadores do dia"></section>
+
+  <div class="section-title">
+    <h2>Ranking por vendedor</h2>
+    <span id="contagem"></span>
+  </div>
+
+  <ol class="ranking" id="ranking"><li class="empty">Carregando dados…</li></ol>
+
+  <div class="note">
+    ⚠️ <strong>Critério:</strong> vendas faturadas (tipo VENDA, posição "F - Faturado") menos devoluções
+    (tipo DEV, posição "DEV - Devolução"), por data de faturamento, fuso de Belém.
+    Os dados são consultados direto da base a cada atualização.
+  </div>
+
+  <footer>
+    <span class="brand">Murano Professional</span>
+    <span>Última atualização: <span id="atualizadoEm">—</span></span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var API = 'https://jjvbmqycgjgkwidgcmif.supabase.co/functions/v1/bi-ranking-vendas?format=json';
+  var brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  var pctF = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
+  var dataFmt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full', timeZone: 'America/Belem' });
+  var horaFmt = new Intl.DateTimeFormat('pt-BR', { timeStyle: 'medium', timeZone: 'America/Belem' });
+  var minor = { da: 1, de: 1, do: 1, das: 1, dos: 1, e: 1 };
+  var loaded = false;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function titleCase(s) {
+    return String(s).toLowerCase().split(/\s+/).map(function (w, i) {
+      if (i > 0 && minor[w]) return w;
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(' ');
+  }
+  function kpi(label, value) {
+    return '<div class="kpi"><div class="label">' + label + '</div><div class="value">' + value + '</div></div>';
+  }
+
+  function render(d) {
+    loaded = true;
+    var t = d.totais;
+    document.getElementById('dataDia').textContent = dataFmt.format(new Date(d.geradoEm));
+    document.getElementById('atualizadoEm').textContent = horaFmt.format(new Date(d.geradoEm));
+
+    var kpis = '<div class="kpi hero"><div class="label">Faturamento líquido do dia</div><div class="value">'
+      + brl.format(t.liquido) + '</div><div class="sub">Bruto ' + brl.format(t.bruto)
+      + ' · Devoluções ' + brl.format(t.devolucoes) + ' (' + t.dev_pedidos + (t.dev_pedidos == 1 ? ' pedido' : ' pedidos') + ')</div></div>';
+    kpis += kpi('Pedidos', String(t.pedidos));
+    kpis += kpi('Clientes positivados', String(t.clientes));
+    kpis += kpi('Ticket médio / cliente', t.clientes > 0 ? brl.format(t.liquido / t.clientes) : '—');
+    kpis += kpi('Ticket médio / pedido', t.pedidos > 0 ? brl.format(t.liquido / t.pedidos) : '—');
+    document.getElementById('kpis').innerHTML = kpis;
+
+    var list = d.ranking || [];
+    document.getElementById('contagem').textContent = list.length
+      ? list.length + (list.length == 1 ? ' vendedor' : ' vendedores') + ' · barra proporcional ao líder'
+      : '';
+
+    var lider = 0;
+    list.forEach(function (v) { if (v.liquido > lider) lider = v.liquido; });
+
+    var html = '';
+    list.forEach(function (v, i) {
+      var share = t.liquido > 0 ? (v.liquido / t.liquido) * 100 : 0;
+      var barW = lider > 0 ? (v.liquido / lider) * 100 : 0;
+      var cls = 'row' + (i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '');
+      html += '<li class="' + cls + '">'
+        + '<div class="pos">' + (i + 1) + '</div>'
+        + '<div class="name">' + esc(titleCase(v.nome)) + '</div>'
+        + '<div class="valor">' + brl.format(v.liquido) + '</div>'
+        + '<div class="bar"><div class="bar-fill" data-w="' + barW.toFixed(1) + '"></div></div>'
+        + '<div class="meta"><span><b>' + v.pedidos + '</b>' + (v.pedidos == 1 ? ' pedido' : ' pedidos') + '</span>'
+        + '<span><b>' + v.clientes + '</b>' + (v.clientes == 1 ? ' cliente' : ' clientes') + '</span>'
+        + '<span><b>' + pctF.format(share) + '%</b> do dia</span></div>'
+        + '</li>';
+    });
+    if (!list.length) {
+      html = '<li class="empty">Nenhuma venda faturada até agora hoje.</li>';
+    }
+    document.getElementById('ranking').innerHTML = html;
+
+    requestAnimationFrame(function () {
+      var fills = document.querySelectorAll('.bar-fill');
+      for (var i = 0; i < fills.length; i++) {
+        (function (el, idx) {
+          setTimeout(function () { el.style.width = el.dataset.w + '%'; }, 40 * idx);
+        })(fills[i], i);
+      }
+    });
+  }
+
+  function load() {
+    fetch(API, { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(render)
+      .catch(function () {
+        if (!loaded) {
+          document.getElementById('ranking').innerHTML =
+            '<li class="empty">Não foi possível carregar os dados agora. Nova tentativa em instantes…</li>';
+        }
+      });
+  }
+
+  load();
+  setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>

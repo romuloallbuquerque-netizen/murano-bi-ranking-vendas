@@ -88,15 +88,53 @@
   }
   .live-dot { width: 1.1vh; height: 1.1vh; border-radius: 50%; background: var(--murano-orange); animation: blink 2s ease-in-out infinite; }
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .title-row {
+    display: flex; align-items: stretch; justify-content: space-between;
+    gap: 1vw; flex-wrap: wrap;
+  }
+  .title-row h1 { flex: 1 1 0; }
   h1 {
     font-family: 'Syne', 'Inter', sans-serif;
     font-weight: 800;
-    font-size: clamp(1.8rem, 5.4vh, 4.2rem);
+    font-size: clamp(1.6rem, min(4.7vh, 2.25vw), 3.8rem);
     letter-spacing: -0.02em;
     line-height: 1.03;
     color: var(--murano-white);
     text-wrap: balance;
+    min-width: 0;
   }
+  .meta-card {
+    flex: 0 0 auto;
+    background: var(--card);
+    border: 1px solid rgba(221,66,34,0.5);
+    border-radius: 14px;
+    padding: 1.4vh 1.1vw;
+    display: flex; flex-direction: column; justify-content: center;
+    gap: 0.7vh;
+    min-width: clamp(120px, 8.5vw, 190px);
+  }
+  .meta-card .label {
+    font-size: clamp(0.55rem, 1.35vh, 0.95rem);
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--murano-muted);
+  }
+  .meta-card .value {
+    font-size: clamp(1.1rem, 3.1vh, 2.3rem);
+    font-weight: 800; color: var(--murano-white);
+    letter-spacing: -0.01em; white-space: nowrap;
+  }
+  .meta-bar { height: 0.7vh; border-radius: 100px; background: rgba(154,128,152,0.18); overflow: hidden; }
+  .meta-fill {
+    height: 100%; border-radius: 100px;
+    background: linear-gradient(90deg, var(--murano-orange), var(--murano-wine));
+    width: 0; transition: width 0.9s cubic-bezier(.22,.9,.35,1);
+  }
+  .meta-card .pct { font-size: clamp(0.6rem, 1.5vh, 1rem); color: var(--murano-muted); white-space: nowrap; }
+  .meta-card.hit {
+    border-color: rgba(221,66,34,0.9);
+    background: linear-gradient(120deg, rgba(221,66,34,0.30), rgba(98,18,68,0.5));
+  }
+  .meta-card.hit .pct { color: #ffb59e; font-weight: 700; }
   .data {
     font-size: clamp(0.85rem, 2.2vh, 1.5rem);
     color: var(--murano-muted);
@@ -257,7 +295,15 @@
     <span class="eyebrow">B.I. Comercial · Ranking Diário</span>
     <span class="live"><span class="live-dot"></span> Ao vivo</span>
   </div>
-  <h1>Ranking de Vendas</h1>
+  <div class="title-row">
+    <h1>Ranking de Vendas</h1>
+    <div class="meta-card" id="metaCard">
+      <div class="label">Meta de hoje</div>
+      <div class="value" id="metaValor">—</div>
+      <div class="meta-bar"><div class="meta-fill" id="metaFill"></div></div>
+      <div class="pct" id="metaPct">—</div>
+    </div>
+  </div>
   <p class="data"><strong id="dataDia">—</strong></p>
 
   <div class="hero">
@@ -291,6 +337,7 @@
 <script>
 (function () {
   var API = 'https://jjvbmqycgjgkwidgcmif.supabase.co/functions/v1/bi-ranking-vendas?format=json';
+  var META_DIA = 24000;
   var brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
   var pctF = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
   var dataFmt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full', timeZone: 'America/Belem' });
@@ -330,6 +377,13 @@
     setText('atualizadoEm', horaFmt.format(new Date(d.geradoEm)));
     setText('totalDia', brl.format(t.liquido));
     fitHero();
+
+    var brlInt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+    var pctMeta = META_DIA > 0 ? (t.liquido / META_DIA) * 100 : 0;
+    setText('metaValor', brlInt.format(META_DIA));
+    setText('metaPct', pctF.format(pctMeta) + '% atingida');
+    document.getElementById('metaFill').style.width = Math.min(100, pctMeta).toFixed(1) + '%';
+    document.getElementById('metaCard').classList.toggle('hit', pctMeta >= 100);
     setText('heroSub', 'Bruto ' + brl.format(t.bruto) + ' · Devoluções ' + brl.format(t.devolucoes)
       + ' (' + t.dev_pedidos + (t.dev_pedidos == 1 ? ' pedido' : ' pedidos') + ')');
     setText('stPedidos', String(t.pedidos));

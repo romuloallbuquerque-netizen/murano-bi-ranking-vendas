@@ -194,7 +194,7 @@
       <div class="live"><span class="live-dot"></span> Ao vivo · atualiza a cada 60s</div>
     </div>
     <h1>Ranking de Vendas</h1>
-    <p class="subtitle"><strong id="dataDia">—</strong> · faturamento líquido por vendedor</p>
+    <p class="subtitle"><strong id="dataDia">—</strong> · vendas emitidas hoje por vendedor</p>
   </header>
 
   <section class="kpis" id="kpis" aria-label="Indicadores do dia"></section>
@@ -207,8 +207,8 @@
   <ol class="ranking" id="ranking"><li class="empty">Carregando dados…</li></ol>
 
   <div class="note">
-    ⚠️ <strong>Critério:</strong> vendas faturadas (tipo VENDA, posição "F - Faturado") menos devoluções
-    (tipo DEV, posição "DEV - Devolução"), por data de faturamento, fuso de Belém.
+    ⚠️ <strong>Critério:</strong> pedidos de venda <strong>emitidos hoje</strong> (fuso de Belém), em qualquer
+    posição — cada pedido conta uma vez; quando já faturado, vale o valor faturado — menos devoluções do dia.
     Somente operação de Belém — a filial do Maranhão não entra no ranking.
     Os dados são consultados direto da base a cada atualização.
   </div>
@@ -250,7 +250,7 @@
     document.getElementById('dataDia').textContent = dataFmt.format(new Date(d.geradoEm));
     document.getElementById('atualizadoEm').textContent = horaFmt.format(new Date(d.geradoEm));
 
-    var kpis = '<div class="kpi hero"><div class="label">Faturamento líquido do dia</div><div class="value">'
+    var kpis = '<div class="kpi hero"><div class="label">Vendas do dia (líquido)</div><div class="value">'
       + brl.format(t.liquido) + '</div><div class="sub">Bruto ' + brl.format(t.bruto)
       + ' · Devoluções ' + brl.format(t.devolucoes) + ' (' + t.dev_pedidos + (t.dev_pedidos == 1 ? ' pedido' : ' pedidos') + ')</div></div>';
     kpis += kpi('Pedidos', String(t.pedidos));

@@ -393,7 +393,8 @@
     var brlInt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
     var meta = (d.meta != null ? Number(d.meta) : META_DIA) || 0;
     var metaCard = document.getElementById('metaCard');
-    if (meta > 0) {
+    // meta é do DIA ATUAL — só mostra ao vivo (hoje); em dia passado o quadro some.
+    if (aoVivo && meta > 0) {
       metaCard.style.display = '';
       var pctMeta = (t.liquido / meta) * 100;
       setText('metaValor', brlInt.format(meta));

@@ -88,6 +88,24 @@
   }
   .live-dot { width: 1.1vh; height: 1.1vh; border-radius: 50%; background: var(--murano-orange); animation: blink 2s ease-in-out infinite; }
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .live.hist { color: var(--murano-orange); border-color: rgba(221,66,34,0.45); }
+  .datepick {
+    display: inline-flex; align-items: center; gap: 0.4vw;
+    border: 1px solid rgba(154,128,152,0.35); border-radius: 100px;
+    padding: 0.45vh 1vw; background: rgba(36,19,39,0.55); cursor: pointer;
+    font-size: clamp(0.6rem, 1.3vh, 1rem); font-weight: 700; color: var(--murano-blush);
+  }
+  .datepick input {
+    background: transparent; border: none; outline: none; cursor: pointer;
+    color: var(--murano-blush); font-family: inherit; font-size: inherit; font-weight: 700;
+    color-scheme: dark;
+  }
+  .hojeBtn {
+    border: 1px solid rgba(221,66,34,0.55); color: var(--murano-orange);
+    background: rgba(221,66,34,0.12); border-radius: 100px; padding: 0.45vh 1.1vw;
+    font-size: clamp(0.6rem, 1.3vh, 1rem); font-weight: 800; letter-spacing: 0.06em;
+    text-transform: uppercase; cursor: pointer; white-space: nowrap;
+  }
   .title-row {
     display: flex; align-items: stretch; justify-content: space-between;
     gap: 1vw; flex-wrap: wrap;
@@ -293,12 +311,14 @@
 <section class="left">
   <div class="badges">
     <span class="eyebrow">B.I. Comercial · Ranking Diário</span>
-    <span class="live"><span class="live-dot"></span> Ao vivo · atualiza a cada 60s</span>
+    <span class="live" id="liveBadge"><span class="live-dot"></span> Ao vivo · atualiza a cada 60s</span>
+    <label class="datepick" title="Ver o ranking de um dia passado"><span>📅</span><input type="date" id="diaInput"></label>
+    <button class="hojeBtn" id="hojeBtn" hidden>● Voltar pra hoje</button>
   </div>
   <div class="title-row">
     <h1>Ranking de Vendas</h1>
     <div class="meta-card" id="metaCard">
-      <div class="label">Meta de hoje</div>
+      <div class="label">Meta do dia</div>
       <div class="value" id="metaValor">—</div>
       <div class="meta-bar"><div class="meta-fill" id="metaFill"></div></div>
       <div class="pct" id="metaPct">—</div>
@@ -337,7 +357,10 @@
 <script>
 (function () {
   var API = 'https://wtunzezigncwjpcqsfzk.supabase.co/functions/v1/bi-ranking-vendas';
-  var META_DIA = 24000;
+  var META_DIA = 0; // fallback; o valor real vem de d.meta (bi_config, definido pelo admin no CRM)
+  var diaSel = null;      // null = hoje (ao vivo); 'AAAA-MM-DD' = dia passado (snapshot)
+  var hojeStr = null;     // data de hoje (Belem), vinda do payload
+  var pickerReady = false;
   var brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
   var pctF = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
   var dataFmt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full', timeZone: 'America/Belem' });
@@ -373,17 +396,43 @@
     ultimo = d;
     var t = d.totais;
 
-    setText('dataDia', dataFmt.format(new Date(d.geradoEm)));
+    // ao vivo (hoje) x historico (dia passado)
+    var aoVivo = d.aoVivo !== false && !diaSel;
+    var liveEl = document.getElementById('liveBadge');
+    liveEl.className = 'live' + (aoVivo ? '' : ' hist');
+    liveEl.innerHTML = aoVivo
+      ? '<span class="live-dot"></span> Ao vivo · atualiza a cada 60s'
+      : '🕐 Histórico · dia fechado';
+    document.getElementById('hojeBtn').hidden = aoVivo;
+
+    // seletor de data: min/max = intervalo com snapshot; valor inicial = hoje
+    if (d.diasDisponiveis && d.diasDisponiveis.length) {
+      hojeStr = d.diasDisponiveis[0];
+      var inp = document.getElementById('diaInput');
+      inp.max = d.diasDisponiveis[0];
+      inp.min = d.diasDisponiveis[d.diasDisponiveis.length - 1];
+      if (!pickerReady) { pickerReady = true; if (!inp.value) inp.value = diaSel || hojeStr; }
+    }
+
+    var dataBase = d.dia ? new Date(d.dia + 'T12:00:00-03:00') : new Date(d.geradoEm);
+    setText('dataDia', dataFmt.format(dataBase));
     setText('atualizadoEm', horaFmt.format(new Date(d.geradoEm)));
     setText('totalDia', brl.format(t.liquido));
     fitHero();
 
     var brlInt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
-    var pctMeta = META_DIA > 0 ? (t.liquido / META_DIA) * 100 : 0;
-    setText('metaValor', brlInt.format(META_DIA));
-    setText('metaPct', pctF.format(pctMeta) + '% atingida');
-    document.getElementById('metaFill').style.width = Math.min(100, pctMeta).toFixed(1) + '%';
-    document.getElementById('metaCard').classList.toggle('hit', pctMeta >= 100);
+    var meta = (d.meta != null ? Number(d.meta) : META_DIA) || 0;
+    var metaCard = document.getElementById('metaCard');
+    if (meta > 0) {
+      metaCard.style.display = '';
+      var pctMeta = (t.liquido / meta) * 100;
+      setText('metaValor', brlInt.format(meta));
+      setText('metaPct', pctF.format(pctMeta) + '% atingida');
+      document.getElementById('metaFill').style.width = Math.min(100, pctMeta).toFixed(1) + '%';
+      metaCard.classList.toggle('hit', pctMeta >= 100);
+    } else {
+      metaCard.style.display = 'none'; // sem meta definida -> esconde o card
+    }
     setText('heroSub', 'Bruto ' + brl.format(t.bruto) + ' · Devoluções ' + brl.format(t.devolucoes)
       + ' (' + t.dev_pedidos + (t.dev_pedidos == 1 ? ' pedido' : ' pedidos') + ')');
     setText('stPedidos', String(t.pedidos));
@@ -397,7 +446,7 @@
     if (!list.length) {
       ol.style.gridTemplateRows = 'none';
       ol.style.gridTemplateColumns = '1fr';
-      ol.innerHTML = '<li class="empty">Nenhuma venda registrada até agora hoje.</li>';
+      ol.innerHTML = '<li class="empty">' + (aoVivo ? 'Nenhuma venda registrada até agora hoje.' : 'Sem dados de ranking para este dia.') + '</li>';
       return;
     }
 
@@ -436,7 +485,8 @@
   }
 
   function load() {
-    fetch(API, { cache: 'no-store' })
+    var u = API + (diaSel ? ('?dia=' + encodeURIComponent(diaSel)) : '');
+    fetch(u, { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(render)
       .catch(function () {
@@ -466,6 +516,18 @@
       .catch(function () { /* sem rede ou build em andamento: tenta no proximo ciclo */ });
   }
 
+  // Seletor de dia: escolher uma data passada carrega o snapshot daquele dia; voltar pra hoje = ao vivo
+  document.getElementById('diaInput').addEventListener('change', function () {
+    var v = this.value;
+    diaSel = (!v || v === hojeStr) ? null : v;
+    load();
+  });
+  document.getElementById('hojeBtn').addEventListener('click', function () {
+    diaSel = null;
+    if (hojeStr) document.getElementById('diaInput').value = hojeStr;
+    load();
+  });
+
   // Recarrega os dados na hora quando a rede volta ou a aba volta a ficar visivel
   window.addEventListener('online', load);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
@@ -474,7 +536,7 @@
   setTimeout(function () { location.reload(); }, 24 * 60 * 60 * 1000);
 
   load();
-  setInterval(load, 60000);
+  setInterval(function () { if (!diaSel) load(); }, 60000); // só auto-atualiza quando está no dia de hoje
   checkVersion();
   setInterval(checkVersion, 5 * 60 * 1000);
 })();

@@ -1,0 +1,4 @@
+# A raiz da Netlify serve o painel (fonte-painel.html), preservando query (?dia=).
+# O index.html do repo é só o redirect do GitHub Pages (github.io -> netlify); a Netlify
+# não deve servir aquele redirect na raiz (senão faz loop). Rewrite 200 (sem trocar a URL).
+/*    /fonte-painel.html    200

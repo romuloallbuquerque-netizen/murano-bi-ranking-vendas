@@ -30,8 +30,8 @@
     background: linear-gradient(155deg, #1c0e1b 0%, #0d0512 100%);
     font-variant-numeric: tabular-nums;
     display: grid;
-    grid-template-columns: clamp(340px, 32vw, 600px) 1fr;
-    gap: 2vw;
+    grid-template-columns: clamp(320px, 28vw, 540px) 1fr;
+    gap: 1.8vw;
     padding: 3.4vh 2.4vw;
   }
   .grid-bg {
@@ -217,49 +217,59 @@
     gap: 1.4vh 1vw;
   }
   .row {
-    display: grid;
-    grid-template-columns: auto auto 1fr auto;
-    grid-template-areas: "pos avatar name valor" "pos bar bar bar";
-    align-items: center;
-    column-gap: 1vw;
-    row-gap: 0.9vh;
+    display: flex;
+    align-items: stretch;
     background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: 14px;
-    padding: 1.2vh 1.2vw;
+    overflow: hidden;
     min-height: 0; min-width: 0;
   }
   .row.top1 { background: linear-gradient(120deg, rgba(221,66,34,0.30), rgba(98,18,68,0.5)); border-color: rgba(221,66,34,0.65); }
-  .pos {
-    grid-area: pos;
-    width: clamp(1.8rem, 4.6vh, 3.2rem); height: clamp(1.8rem, 4.6vh, 3.2rem);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: clamp(0.8rem, 2.2vh, 1.5rem);
-    background: rgba(98,18,68,0.5); color: var(--murano-blush);
-    border: 1px solid rgba(154,128,152,0.35);
-  }
-  .top1 .pos { background: var(--murano-orange); color: #fff; border-color: transparent; }
-  .top2 .pos, .top3 .pos { background: var(--murano-wine); color: #fff; border-color: transparent; }
+  /* Foto/avatar: quadrado que ocupa TODA a altura da linha, colado na borda esquerda */
   .avatar {
-    grid-area: avatar;
     position: relative;
-    width: clamp(2rem, 5.4vh, 3.8rem); height: clamp(2rem, 5.4vh, 3.8rem);
-    border-radius: 50%; overflow: hidden; flex: none;
+    align-self: stretch;
+    aspect-ratio: 1 / 1;
+    flex: none;
+    min-width: 0; min-height: 0;
+    overflow: hidden;
     background: rgba(98,18,68,0.5);
-    border: 1px solid rgba(154,128,152,0.35);
-  }
-  .avatar .ini {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: clamp(0.68rem, 1.9vh, 1.25rem);
-    color: var(--murano-blush); letter-spacing: .02em;
+    border-right: 1px solid var(--card-border);
   }
   .avatar .foto {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: cover; z-index: 1;
   }
-  .top1 .avatar { border-color: var(--murano-orange); }
+  .avatar .ini {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: clamp(1rem, 3.4vh, 2.4rem);
+    color: var(--murano-blush); letter-spacing: .02em;
+  }
+  /* Selo de posição sobre a foto (canto superior esquerdo) */
+  .avatar .rank {
+    position: absolute; top: 0; left: 0; z-index: 2;
+    min-width: clamp(1.3rem, 3.4vh, 2.3rem); height: clamp(1.3rem, 3.4vh, 2.3rem);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 0.35rem;
+    font-weight: 800; font-size: clamp(0.68rem, 1.9vh, 1.25rem);
+    color: #fff; background: rgba(20,8,18,0.58);
+    border-bottom-right-radius: 12px;
+  }
+  .top1 .avatar .rank { background: var(--murano-orange); }
+  .top2 .avatar .rank, .top3 .avatar .rank { background: var(--murano-wine); }
+  .top1 .avatar { border-right-color: rgba(221,66,34,0.5); }
+  /* Bloco de conteúdo à direita da foto */
+  .rowbody {
+    flex: 1 1 auto; min-width: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "name valor" "bar bar";
+    align-items: center;
+    column-gap: 1vw; row-gap: 0.9vh;
+    padding: 1.1vh 1.2vw;
+  }
   .name {
     grid-area: name;
     font-weight: 600;
@@ -299,7 +309,8 @@
       gap: 3vh; padding: 3vh 5vw;
     }
     #ranking { grid-auto-flow: row !important; grid-template-columns: 1fr !important; grid-template-rows: none !important; height: auto; }
-    .row { padding: 1.6vh 4vw; }
+    .row { min-height: 68px; }
+    .rowbody { padding: 1.6vh 4vw; }
     .hero .value { font-size: clamp(2.2rem, 11vw, 4.5rem); }
   }
 </style>
@@ -373,11 +384,12 @@
     var a = p[0] ? p[0][0] : '', b = p.length > 1 ? p[p.length - 1][0] : '';
     return (a + b).toUpperCase() || '–';
   }
-  function avatarHTML(nome){
+  function avatarHTML(nome, pos){
     var full = normNome(nome).trim(), first = full.split(/\s+/)[0] || '';
     var url = FOTOS[full] || FOTOS[first] || '';
     var img = url ? '<img class="foto" src="' + url + '" alt="" onerror="this.remove()">' : '';
-    return '<div class="avatar"><span class="ini">' + esc(iniciais(nome)) + '</span>' + img + '</div>';
+    return '<div class="avatar"><span class="ini">' + esc(iniciais(nome)) + '</span>' + img
+      + '<span class="rank">' + pos + '</span></div>';
   }
   var META_DIA = 0; // fallback; o valor real vem de d.meta (bi_config, definido pelo admin no CRM)
   // dia a exibir vem da URL (?dia=AAAA-MM-DD), controlado pelo CRM. Sem o param = hoje (ao vivo).
@@ -477,12 +489,13 @@
       var barW = lider > 0 ? (v.liquido / lider) * 100 : 0;
       var cls = 'row' + (i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '');
       html += '<li class="' + cls + '">'
-        + '<div class="pos">' + (i + 1) + '</div>'
-        + avatarHTML(v.nome)
-        + '<div class="name">' + esc(titleCase(v.nome))
+        + avatarHTML(v.nome, i + 1)
+        + '<div class="rowbody">'
+        + '<div class="name">' + esc(titleCase(v.nome).split(' ')[0])
         + ' <span class="meta">· ' + v.pedidos + ' ped · ' + pctF.format(share) + '%</span></div>'
         + '<div class="valor">' + brl.format(v.liquido) + '</div>'
         + '<div class="bar"><div class="bar-fill" data-w="' + barW.toFixed(1) + '"></div></div>'
+        + '</div>'
         + '</li>';
     });
     ol.innerHTML = html;

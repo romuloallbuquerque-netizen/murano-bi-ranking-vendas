@@ -1,3 +1,8 @@
+# Fotos dos vendedores: servir o arquivo REAL. Precisa vir ANTES do catch-all forçado
+# abaixo (que tem "!" e sobrescreveria até arquivos existentes, servindo o HTML no lugar
+# da imagem). :splat repassa o caminho pro próprio arquivo estático.
+/fotos/*    /fotos/:splat    200
+
 # A raiz da Netlify serve o painel (fonte-painel.html), preservando a query (?dia=).
 # O "!" FORÇA o rewrite mesmo existindo o index.html na raiz (senão a Netlify serviria o
 # index.html, que é só o redirect do GitHub Pages e faria loop). 200 = serve sem trocar a URL.

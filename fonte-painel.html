@@ -396,9 +396,10 @@
     var a = p[0] ? p[0][0] : '', b = p.length > 1 ? p[p.length - 1][0] : '';
     return (a + b).toUpperCase() || '–';
   }
-  function avatarHTML(nome, pos){
+  function avatarHTML(nome, pos, fotoUrl){
     var full = normNome(nome).trim(), first = full.split(/\s+/)[0] || '';
-    var url = FOTOS[full] || FOTOS[first] || '';
+    // prioridade: foto vinda dos dados (upload dinamico) > mapa estatico > iniciais
+    var url = fotoUrl || FOTOS[full] || FOTOS[first] || '';
     var img = url ? '<img class="foto" src="' + url + '" alt="" onerror="this.remove()">' : '';
     return '<div class="avatar"><span class="ini">' + esc(iniciais(nome)) + '</span>' + img
       + '<span class="rank">' + pos + '</span></div>';
@@ -501,7 +502,7 @@
       var barW = lider > 0 ? (v.liquido / lider) * 100 : 0;
       var cls = 'row' + (i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '');
       html += '<li class="' + cls + '">'
-        + avatarHTML(v.nome, i + 1)
+        + avatarHTML(v.nome, i + 1, v.foto)
         + '<div class="rowbody">'
         + '<div class="name">' + esc(titleCase(v.nome).split(' ')[0])
         + ' <span class="meta">· ' + v.pedidos + ' ped · ' + pctF.format(share) + '%</span></div>'

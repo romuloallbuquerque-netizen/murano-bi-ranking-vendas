@@ -301,6 +301,80 @@
     grid-column: 1 / -1; grid-row: 1 / -1;
   }
 
+  /* ---------- Tela de comemoração (venda nova) ---------- */
+  .celebra {
+    position: fixed; inset: 0; z-index: 60;
+    display: none; opacity: 0;
+    align-items: center; justify-content: center; text-align: center;
+    background:
+      radial-gradient(circle at 50% 24%, rgba(221,66,34,0.34), transparent 56%),
+      radial-gradient(circle at 50% 60%, rgba(98,18,68,0.97), rgba(9,3,13,0.99));
+    transition: opacity .5s ease; overflow: hidden;
+  }
+  .celebra.show { display: flex; opacity: 1; }
+  .celebra .card {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 1.5vh; padding: 3.5vh 5vw; max-width: 94vw;
+    transform: scale(.82); opacity: 0;
+    animation: pop .7s cubic-bezier(.2,1.25,.4,1) forwards;
+  }
+  @keyframes pop { to { transform: scale(1); opacity: 1; } }
+  .celebra .eyebrow2 {
+    font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+    color: #ffd0a0; font-size: clamp(.85rem, 2.3vh, 1.5rem);
+  }
+  .celebra .foto-wrap {
+    position: relative; width: clamp(140px, 29vh, 320px); aspect-ratio: 1/1;
+    border-radius: 50%; overflow: hidden;
+    border: .5vh solid rgba(221,66,34,.9);
+    background: rgba(98,18,68,.6);
+    animation: glowfoto 2.2s ease-in-out infinite;
+  }
+  @keyframes glowfoto {
+    0%,100% { box-shadow: 0 0 0 1.2vh rgba(221,66,34,.16), 0 0 8vh rgba(221,66,34,.5); }
+    50%     { box-shadow: 0 0 0 1.7vh rgba(221,66,34,.30), 0 0 17vh rgba(221,66,34,.85); }
+  }
+  .celebra .foto-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
+  .celebra .foto-wrap .cini {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: clamp(2.6rem, 13vh, 8rem); color: var(--murano-blush);
+  }
+  .celebra .nome {
+    font-family: 'Syne','Inter',sans-serif; font-weight: 800;
+    font-size: clamp(1.9rem, 7.6vh, 5.6rem); color: #fff; line-height: 1.02; letter-spacing: -.02em;
+  }
+  .celebra .arqueti { color: #ffb59e; font-weight: 700; font-size: clamp(.85rem, 2.5vh, 1.6rem); text-transform: uppercase; letter-spacing: .08em; }
+  .celebra .tag { color: var(--murano-blush); font-style: italic; font-size: clamp(.82rem, 2.3vh, 1.45rem); opacity: .92; max-width: 74vw; }
+  .celebra .valor2 {
+    font-family: 'Syne',sans-serif; font-weight: 800;
+    font-size: clamp(2.2rem, 9.5vh, 6.6rem); color: #fff; line-height: 1;
+    text-shadow: 0 0 6vh rgba(221,66,34,.7); margin-top: .3vh;
+  }
+  .celebra .valor2 small { font-size: .42em; color: #ffd0a0; font-weight: 700; vertical-align: .35em; }
+  .celebra .valor2.metabatida { font-size: clamp(1.9rem, 8vh, 5.4rem); letter-spacing: .05em; color: #ffd0a0; }
+  .celebra .cliente2 { color: var(--murano-blush); font-size: clamp(.85rem, 2.3vh, 1.5rem); margin-top: .2vh; }
+  .celebra .cliente2 b { color: #fff; font-weight: 700; }
+  .celebra .chips { display: flex; gap: 1vw; flex-wrap: wrap; justify-content: center; margin-top: .5vh; }
+  .celebra .chip {
+    background: rgba(36,19,39,.72); border: 1px solid rgba(221,66,34,.5);
+    border-radius: 100px; padding: .85vh 1.5vw; color: var(--murano-blush);
+    font-size: clamp(.72rem, 1.95vh, 1.2rem); font-weight: 600; white-space: nowrap;
+  }
+  .celebra .chip b { color: #fff; }
+  .celebra .quals { display: flex; flex-direction: column; gap: .6vh; margin-top: .3vh; }
+  .celebra .qual { display: inline-flex; align-items: center; gap: .6vw; justify-content: center; color: var(--murano-blush); font-size: clamp(.78rem, 2vh, 1.3rem); }
+  .celebra .qual::before { content: '★'; color: var(--murano-orange); }
+  .celebra .fecho { margin-top: .8vh; color: #ffd0a0; font-weight: 700; font-size: clamp(.9rem, 2.4vh, 1.55rem); }
+  .confete { position: absolute; top: -8vh; width: .9vw; min-width: 7px; height: 1.7vh; min-height: 12px; z-index: 1; border-radius: 2px; animation: cair linear forwards; }
+  @keyframes cair { to { transform: translateY(116vh) rotate(760deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .confete { display: none; }
+    .celebra .foto-wrap { animation: none; }
+    .celebra .card { animation: none; transform: none; opacity: 1; }
+  }
+
   /* ---------- Fallback retrato (celular) ---------- */
   @media (orientation: portrait) {
     body {
@@ -365,6 +439,8 @@
   <ol id="ranking"><li class="empty">Carregando dados…</li></ol>
 </section>
 
+<div id="celebra" class="celebra" aria-hidden="true"></div>
+
 <script>
 (function () {
   var API = 'https://wtunzezigncwjpcqsfzk.supabase.co/functions/v1/bi-ranking-vendas';
@@ -407,6 +483,7 @@
   var META_DIA = 0; // fallback; o valor real vem de d.meta (bi_config, definido pelo admin no CRM)
   // dia a exibir vem da URL (?dia=AAAA-MM-DD), controlado pelo CRM. Sem o param = hoje (ao vivo).
   var diaSel = (new URLSearchParams(location.search)).get('dia') || null;
+  var desfileMode = (new URLSearchParams(location.search)).get('desfile'); // ?desfile=1 = desfile único
   var brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
   var pctF = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
   var dataFmt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full', timeZone: 'America/Belem' });
@@ -478,6 +555,7 @@
     setText('stTicketPed', t.pedidos > 0 ? brl.format(t.liquido / t.pedidos) : '—');
 
     var list = d.ranking || [];
+    if (aoVivo && !desfilando) detectarVendas(list); // comemoração ao vivo (não durante o desfile)
     var ol = document.getElementById('ranking');
 
     if (!list.length) {
@@ -523,6 +601,346 @@
     });
   }
 
+  // ---- Tela de comemoração (venda nova) --------------------------------------
+  // Compara cada atualização com a anterior; se o nº de pedidos de um vendedor
+  // sobe, é venda nova -> mostra a foto ampliada + dados da venda + elogios por
+  // 30s e volta ao ranking. Na 1ª carga só estabelece a linha de base (não festeja
+  // vendas que já estavam na tela ao abrir).
+  var baseVendas = null;      // nome -> { liquido, pedidos }
+  var filaFesta = [];         // comemorações pendentes
+  var festejando = false;
+  var desfilando = false;     // true durante o desfile único (?desfile=1)
+  var ultimoDesfileId = null, ultimoParabensId = null, ultimoMetaId = null, comandoIniciado = false; // comandos remotos (poll do CRM)
+  var CORES_CONF = ['#dd4222', '#ffb59e', '#621244', '#e4d4d3', '#ffd0a0', '#7b2d8b'];
+  var FRASES_FESTA = ['Excelente trabalho', 'Que venda', 'Foco e atitude', 'Segue voando', 'Time Murano com tudo', 'Isso é talento', 'Mais uma no placar'];
+
+  function detectarVendas(list) {
+    var atual = {};
+    for (var i = 0; i < list.length; i++) { atual[list[i].nome] = { liquido: list[i].liquido, pedidos: list[i].pedidos }; }
+    if (baseVendas !== null) {
+      for (var j = 0; j < list.length; j++) {
+        var v = list[j], prev = baseVendas[v.nome];
+        var prevPed = prev ? prev.pedidos : 0, prevLiq = prev ? prev.liquido : 0;
+        if (v.pedidos > prevPed) {
+          enfileirarFesta({
+            nome: v.nome, foto: v.foto, elogio: v.elogio,
+            posicao: j + 1, total: v.liquido, pedidos: v.pedidos,
+            cliente: (v.ultima && v.ultima.cliente) || null,
+            delta: Math.max(0, Math.round((v.liquido - prevLiq) * 100) / 100)
+          });
+        }
+        var metaV = Number(v.meta) || 0; // bateu a meta individual do dia (cruzou o valor)
+        if (metaV > 0 && prevLiq < metaV && v.liquido >= metaV) {
+          enfileirarFesta({
+            nome: v.nome, foto: v.foto, elogio: v.elogio,
+            posicao: j + 1, total: v.liquido, pedidos: v.pedidos,
+            metaBatida: true, meta: metaV
+          });
+        }
+      }
+    }
+    baseVendas = atual;
+  }
+
+  function enfileirarFesta(info) {
+    if (!info.metaBatida) { // agrega vendas do mesmo vendedor; card de meta é sempre separado
+      for (var i = 0; i < filaFesta.length; i++) {
+        if (filaFesta[i].nome === info.nome && !filaFesta[i].metaBatida) {
+          filaFesta[i].delta += info.delta; filaFesta[i].total = info.total;
+          filaFesta[i].pedidos = info.pedidos; filaFesta[i].posicao = info.posicao;
+          filaFesta[i].cliente = info.cliente; return;
+        }
+      }
+    }
+    filaFesta.push(info);
+    if (!festejando) proximaFesta();
+  }
+  function proximaFesta() {
+    if (!filaFesta.length) { festejando = false; return; }
+    festejando = true;
+    mostrarFesta(filaFesta.shift());
+    setTimeout(function () { esconderFesta(); setTimeout(proximaFesta, 500); }, 30000);
+  }
+
+  // Fanfarra sintetizada (Web Audio) — toca ao mostrar uma comemoração de VENDA (não no
+  // desfile). Precisa de autoplay liberado no navegador da TV; se estiver bloqueado, fica
+  // em silêncio sem erro.
+  var _audioCtx = null;
+  function tocarFanfarra() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!_audioCtx) _audioCtx = new AC();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      var ctx = _audioCtx, t0 = ctx.currentTime;
+      var master = ctx.createGain(); master.gain.value = 0.55; master.connect(ctx.destination);
+      function voz(freq, ini, dur, vol, tipo) {
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = tipo || 'triangle'; o.frequency.value = freq;
+        var t = t0 + ini;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g); g.connect(master);
+        o.start(t); o.stop(t + dur + 0.05);
+      }
+      // fanfarra de vitória em Dó maior (~3,2s): melodia + acorde final + baixo
+      var L = 0.24; // volume da melodia
+      voz(392.00, 0.00, 0.16, L); voz(523.25, 0.16, 0.16, L); // G4 C5
+      voz(659.25, 0.32, 0.16, L); voz(783.99, 0.48, 0.30, L); // E5 G5
+      voz(1046.50, 0.82, 0.34, L);                            // C6
+      voz(987.77, 1.18, 0.12, L); voz(1046.50, 1.31, 0.12, L); // B5 C6
+      voz(1174.66, 1.44, 0.12, L); voz(1318.51, 1.57, 0.44, L); // D6 E6
+      // acorde final Dó maior (2,05s)
+      voz(523.25, 2.05, 1.10, 0.15); voz(659.25, 2.05, 1.10, 0.15);
+      voz(783.99, 2.05, 1.10, 0.15); voz(1046.50, 2.05, 1.20, 0.17);
+      // baixo
+      voz(130.81, 0.00, 0.50, 0.18, 'sawtooth'); voz(196.00, 0.50, 0.50, 0.18, 'sawtooth');
+      voz(130.81, 1.00, 0.50, 0.18, 'sawtooth'); voz(196.00, 1.50, 0.50, 0.18, 'sawtooth');
+      voz(130.81, 2.05, 1.20, 0.22, 'sawtooth');
+    } catch (e) { /* autoplay bloqueado -> silencioso */ }
+  }
+
+  // Samba sintetizado (surdo, tamborim, agogô, ganzá, cavaquinho) ~4,3s.
+  var _noiseBuf = null;
+  function tocarSamba() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!_audioCtx) _audioCtx = new AC();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      var c = _audioCtx, t0 = c.currentTime, m = c.createGain(); m.gain.value = 0.5; m.connect(c.destination);
+      if (!_noiseBuf) { var n = (c.sampleRate * 0.5) | 0, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; _noiseBuf = b; }
+      function surdo(t, v) { var o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.12); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3); o.connect(g); g.connect(m); o.start(t); o.stop(t + 0.32); }
+      function tam(t, v) { var o = c.createOscillator(), g = c.createGain(); o.type = 'square'; o.frequency.value = 900; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05); o.connect(g); g.connect(m); o.start(t); o.stop(t + 0.06); }
+      function agogo(t, hi, v) { var o = c.createOscillator(), g = c.createGain(); o.type = 'triangle'; o.frequency.value = hi ? 1180 : 790; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14); o.connect(g); g.connect(m); o.start(t); o.stop(t + 0.16); }
+      function shaker(t, v) { var s = c.createBufferSource(); s.buffer = _noiseBuf; var hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 6000; var g = c.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05); s.connect(hp); hp.connect(g); g.connect(m); s.start(t); s.stop(t + 0.06); }
+      function cava(t, fr, v) { fr.forEach(function (f) { var o = c.createOscillator(), g = c.createGain(); o.type = 'sawtooth'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16); o.connect(g); g.connect(m); o.start(t); o.stop(t + 0.18); }); }
+      var step = 0.135, Cm = [261.63, 329.63, 392], G = [293.66, 392, 493.88];
+      for (var loop = 0; loop < 9; loop++) { // ~20s (cada volta ~2,16s)
+        var bt = t0 + loop * 16 * step;
+        for (var s = 0; s < 16; s++) {
+          var t = bt + s * step;
+          shaker(t, (s % 2 === 0) ? 0.10 : 0.18);
+          if (s === 4 || s === 12) surdo(t, 0.9); else if (s === 0 || s === 8) surdo(t, 0.45);
+          if ([0, 3, 4, 6, 7, 10, 11, 14, 15].indexOf(s) >= 0) tam(t, 0.22);
+          if (s === 0 || s === 8) agogo(t, true, 0.20); if (s === 4 || s === 12) agogo(t, false, 0.20);
+          if (s === 3 || s === 11) cava(t, Cm, 0.14); if (s === 7 || s === 15) cava(t, G, 0.14);
+        }
+      }
+    } catch (e) { /* silencioso */ }
+  }
+
+  // Pagode sintetizado ORIGINAL (clima de pagode alegre; NÃO copia nenhuma música). Renderizado
+  // 1x num loop de ~5s e tocado em loop por ~10 min — usado só no BATEU A META.
+  var _pagodeBuf = null, _pagodeSrc = null, _pagodeTimer = null, _pagodeRend = false, _PSTEP = 0.1579;
+  function _renderPagode(cb) {
+    if (_pagodeBuf) { cb(_pagodeBuf); return; }
+    if (_pagodeRend) { cb(null); return; } // já está renderizando: não empilha outro
+    try {
+      var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      if (!OAC) { cb(null); return; }
+      var sr = 44100, dur = 32 * _PSTEP + 0.4;
+      var oc = new OAC(1, Math.ceil(sr * dur), sr);
+      var m = oc.createGain(); m.gain.value = 0.5; m.connect(oc.destination);
+      var nb = oc.createBuffer(1, (sr * 0.4) | 0, sr), nd = nb.getChannelData(0);
+      for (var i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+      function env(g, t, a, d, v) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + d); }
+      function surdo(t, v) { var o = oc.createOscillator(), g = oc.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(115, t); o.frequency.exponentialRampToValueAtTime(46, t + 0.13); env(g, t, 0.005, 0.32, v); o.connect(g); g.connect(m); o.start(t); o.stop(t + 0.34); }
+      function tanta(t, f, v) { var o = oc.createOscillator(), g = oc.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.05); env(g, t, 0.005, 0.2, v); o.connect(g); g.connect(m); o.start(t); o.stop(t + 0.22); }
+      function pand(t, v, hi) { var s = oc.createBufferSource(); s.buffer = nb; var f = oc.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hi ? 7000 : 3500; var g = oc.createGain(); env(g, t, 0.002, hi ? 0.03 : 0.06, v); s.connect(f); f.connect(g); g.connect(m); s.start(t); s.stop(t + 0.08); }
+      function cava(t, fr, v) { fr.forEach(function (f) { var o = oc.createOscillator(), g = oc.createGain(); o.type = 'sawtooth'; o.frequency.value = f; env(g, t, 0.006, 0.14, v); o.connect(g); g.connect(m); o.start(t); o.stop(t + 0.16); }); }
+      function melo(t, f, d, v) { var o = oc.createOscillator(), g = oc.createGain(); o.type = 'triangle'; o.frequency.value = f; env(g, t, 0.02, d, v); o.connect(g); g.connect(m); o.start(t); o.stop(t + d + 0.05); }
+      var acordes = [[261.63, 329.63, 392.00], [220.00, 261.63, 329.63], [174.61, 220.00, 261.63], [196.00, 246.94, 293.66]];
+      var baixos = [130.81, 110.00, 87.31, 98.00];
+      for (var comp = 0; comp < 4; comp++) {
+        var ac = acordes[comp], bx = baixos[comp], b0 = comp * 8 * _PSTEP;
+        for (var s = 0; s < 8; s++) {
+          var t = b0 + s * _PSTEP;
+          pand(t, s % 2 === 0 ? 0.10 : 0.16, s % 2 === 1);
+          if (s === 0) { tanta(t, bx, 0.5); surdo(t, 0.4); }
+          if (s === 4) surdo(t, 0.85);
+          if (s === 2 || s === 3 || s === 5 || s === 7) cava(t, ac, 0.13);
+          if (s === 6) tanta(t, bx * 1.5, 0.32);
+        }
+      }
+      var hook = [[0, 0, 523.25, 2], [0, 4, 659.25, 3], [1, 0, 587.33, 4], [2, 0, 698.46, 2], [2, 4, 659.25, 3], [3, 0, 587.33, 2], [3, 4, 523.25, 3]];
+      hook.forEach(function (h) { melo((h[0] * 8 + h[1]) * _PSTEP, h[2], h[3] * _PSTEP, 0.16); });
+      _pagodeRend = true;
+      oc.startRendering().then(function (buf) { _pagodeRend = false; _pagodeBuf = buf; cb(buf); }).catch(function () { _pagodeRend = false; cb(null); });
+    } catch (e) { cb(null); }
+  }
+  function pararPagode() { try { if (_pagodeTimer) { clearTimeout(_pagodeTimer); _pagodeTimer = null; } if (_pagodeSrc) { _pagodeSrc.stop(); _pagodeSrc = null; } } catch (e) {} }
+  function tocarPagode() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      if (!_audioCtx) _audioCtx = new AC();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      _renderPagode(function (buf) {
+        if (!buf) return;
+        pararPagode();
+        var src = _audioCtx.createBufferSource(); src.buffer = buf; src.loop = true;
+        src.loopStart = 0; src.loopEnd = 32 * _PSTEP;
+        src.connect(_audioCtx.destination); src.start();
+        _pagodeSrc = src;
+        _pagodeTimer = setTimeout(pararPagode, 20 * 1000); // 20s
+      });
+    } catch (e) { /* silencioso */ }
+  }
+
+  // Voz: "Parabéns, <primeiro nome>!" (Web Speech). Sujeito ao mesmo autoplay da TV.
+  function falarParabens(nome) {
+    try {
+      var ss = window.speechSynthesis;
+      if (!ss) return;
+      var u = new SpeechSynthesisUtterance('Parabéns, ' + nome + '!');
+      u.lang = 'pt-BR'; u.rate = 1.12; u.pitch = 1.4; u.volume = 1; // bem animado
+      var vs = ss.getVoices() || [];
+      for (var i = 0; i < vs.length; i++) { if (/pt[-_ ]?br/i.test(vs[i].lang) || /portug/i.test(vs[i].name)) { u.voice = vs[i]; break; } }
+      ss.resume();            // destrava se ficou pausado
+      ss.speak(u);            // sem cancel() antes (evita o bug de engolir a fala no Chrome)
+    } catch (e) { /* silencioso */ }
+  }
+  try { if (window.speechSynthesis) { window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = function () {}; } } catch (e) {}
+
+  function confeteHTML() {
+    var s = '';
+    for (var i = 0; i < 46; i++) {
+      var l = (Math.random() * 100).toFixed(1);
+      var dur = (2.8 + Math.random() * 2.6).toFixed(2);
+      var del = (Math.random() * 1.2).toFixed(2);
+      var c = CORES_CONF[i % CORES_CONF.length];
+      s += '<span class="confete" style="left:' + l + '%;background:' + c + ';animation-duration:' + dur + 's;animation-delay:' + del + 's;"></span>';
+    }
+    return s;
+  }
+  function mostrarFesta(info) {
+    var el = document.getElementById('celebra');
+    var nome = titleCase(info.nome), primeiro = nome.split(' ')[0];
+    var full = normNome(info.nome).trim(), fn = full.split(/\s+/)[0] || '';
+    var url = info.foto || FOTOS[full] || FOTOS[fn] || '';
+    var fotoInner = '<span class="cini">' + esc(iniciais(info.nome)) + '</span>'
+      + (url ? '<img src="' + esc(url) + '" alt="" onerror="this.remove()">' : '');
+    var elo = info.elogio || null;
+    var arq = elo && elo.arquetipo ? '<div class="arqueti">' + esc(elo.arquetipo) + '</div>' : '';
+    var tag = elo && elo.tagline ? '<div class="tag">“' + esc(elo.tagline) + '”</div>' : '';
+    var quals = (elo && elo.qualidades && elo.qualidades.length) ? elo.qualidades : [];
+    var qualsHTML = quals.length
+      ? '<div class="quals">' + quals.map(function (q) { return '<span class="qual">' + esc(q) + '</span>'; }).join('') + '</div>'
+      : '';
+    var valorHTML, clienteHTML;
+    if (info.metaBatida) {
+      valorHTML = '<div class="valor2 metabatida">BATEU A META</div>';
+      clienteHTML = '<div class="cliente2">🎯 Meta do dia: <b>' + brl.format(info.meta) + '</b></div>';
+    } else {
+      valorHTML = info.delta > 0
+        ? '<div class="valor2"><small>+</small>' + brl.format(info.delta) + '</div>'
+        : '<div class="valor2">' + brl.format(info.total) + '</div>';
+      clienteHTML = info.cliente
+        ? '<div class="cliente2">🛒 Venda para <b>' + esc(titleCase(info.cliente)) + '</b></div>'
+        : '';
+    }
+    var chips = '<div class="chips">'
+      + '<span class="chip">🏆 <b>#' + info.posicao + '</b> no ranking</span>'
+      + '<span class="chip">Total hoje <b>' + brl.format(info.total) + '</b></span>'
+      + '<span class="chip"><b>' + info.pedidos + '</b> ' + (info.pedidos == 1 ? 'pedido' : 'pedidos') + ' hoje</span>'
+      + '</div>';
+    var fecho = FRASES_FESTA[Math.floor(Math.random() * FRASES_FESTA.length)];
+    var eyebrow = info.metaBatida
+      ? '🎯 Parabéns · Meta do dia'
+      : info.desfile
+      ? '🎉 Parabéns · venda ' + info.idx + ' de ' + info.n
+      : '🎉 Nova venda · Parabéns';
+    el.innerHTML = confeteHTML()
+      + '<div class="card">'
+      + '<div class="eyebrow2">' + eyebrow + '</div>'
+      + '<div class="foto-wrap">' + fotoInner + '</div>'
+      + '<div class="nome">' + esc(nome) + '</div>'
+      + arq + tag + valorHTML + clienteHTML + chips + qualsHTML
+      + '<div class="fecho">' + esc(fecho) + ', ' + esc(primeiro) + '! 👏</div>'
+      + '</div>';
+    if (!info.desfile) { var _prm = titleCase(info.nome).split(' ')[0]; setTimeout(function () { try { if (info.metaBatida) tocarPagode(); else tocarSamba(); falarParabens(_prm); } catch (e) {} }, 0); } // som async: NUNCA trava a tela. meta=pagode; venda=samba; +voz
+    el.classList.add('show');
+    el.setAttribute('aria-hidden', 'false');
+  }
+  function esconderFesta() {
+    var el = document.getElementById('celebra');
+    el.classList.remove('show');
+    el.setAttribute('aria-hidden', 'true');
+    setTimeout(function () { if (!el.classList.contains('show')) el.innerHTML = ''; }, 700);
+  }
+
+  // ---- Desfile único (?desfile=1): toca a tela de parabéns de CADA venda de hoje,
+  // 10s cada, em sequência cronológica; ao fim, volta ao ranking ao vivo. -----------
+  var DESFILE_MS = 3000;
+  function rodarDesfile() {
+    desfilando = true;
+    fetch(API + '?vendas=1', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (d) {
+        var vendas = (d && d.vendas) || [];
+        if (!vendas.length) { finalizarDesfile(); return; }
+        var i = 0, n = vendas.length;
+        (function passo() {
+          if (i >= n) { finalizarDesfile(); return; }
+          var vd = vendas[i];
+          mostrarFesta({
+            nome: vd.vendedor, foto: vd.foto, elogio: vd.elogio,
+            cliente: vd.cliente, delta: vd.valor,
+            total: vd.total, pedidos: vd.pedidos, posicao: vd.posicao,
+            desfile: true, idx: i + 1, n: n
+          });
+          i++;
+          setTimeout(passo, DESFILE_MS);
+        })();
+      })
+      .catch(function () { finalizarDesfile(); });
+  }
+  function finalizarDesfile() {
+    esconderFesta();
+    desfilando = false;
+    try { history.replaceState({}, '', location.pathname); } catch (e) {}
+    baseVendas = null;
+    load();
+  }
+
+  // Comando remoto: o botão "Rodar desfile" no CRM grava bi_config.desfile_comando;
+  // cada painel confere a cada ~6s e, quando o id muda, dispara o desfile ao vivo.
+  function pollComando() {
+    if (diaSel) return; // só no dia de hoje
+    fetch(API + '?comando=1', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        var did = d.desfile || null;
+        var pb = d.parabens || null, pid = pb ? pb.id : null;
+        var mb = d.metabatida || null, mid = mb ? mb.id : null;
+        if (!comandoIniciado) { comandoIniciado = true; ultimoDesfileId = did; ultimoParabensId = pid; ultimoMetaId = mid; return; } // baseline
+        if (did && did !== ultimoDesfileId) {
+          ultimoDesfileId = did;
+          if (!desfilando) rodarDesfile();
+        }
+        if (pid && pid !== ultimoParabensId) { // parabéns de uma venda específica (por cliente)
+          ultimoParabensId = pid;
+          var vd = pb.venda;
+          if (vd && !desfilando) enfileirarFesta({
+            nome: vd.vendedor, foto: vd.foto, elogio: vd.elogio, cliente: vd.cliente,
+            delta: vd.valor, total: vd.total, pedidos: vd.pedidos, posicao: vd.posicao
+          });
+        }
+        if (mid && mid !== ultimoMetaId) { // preview de "BATEU A META" (botão no CRM)
+          ultimoMetaId = mid;
+          var mv = mb.venda;
+          if (mv && !desfilando) enfileirarFesta({
+            nome: mv.nome, foto: mv.foto, elogio: mv.elogio,
+            total: mv.total, pedidos: mv.pedidos, posicao: mv.posicao,
+            metaBatida: true, meta: mv.meta
+          });
+        }
+      })
+      .catch(function () {});
+  }
+
   function load() {
     var u = API + (diaSel ? ('?dia=' + encodeURIComponent(diaSel)) : '');
     fetch(u, { cache: 'no-store' })
@@ -546,6 +964,7 @@
   // a TV recarrega sozinha (confere a cada 5 minutos).
   var htmlBase = null;
   function checkVersion() {
+    if (desfilando) return; // não recarrega no meio do desfile
     fetch(location.href.split('#')[0], { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function (txt) {
@@ -563,7 +982,12 @@
   setTimeout(function () { location.reload(); }, 24 * 60 * 60 * 1000);
 
   load();
-  setInterval(function () { if (!diaSel) load(); }, 60000); // só auto-atualiza quando está no dia de hoje
+  if (desfileMode) rodarDesfile(); // ?desfile=1 dispara o desfile na abertura
+  if (!diaSel) {
+    setInterval(function () { if (!diaSel && !desfilando) load(); }, 60000); // ao vivo (hoje)
+    pollComando();                       // escuta o comando de desfile do CRM
+    setInterval(pollComando, 6000);
+  }
   checkVersion();
   setInterval(checkVersion, 5 * 60 * 1000);
 })();
